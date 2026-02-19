@@ -59,7 +59,7 @@
     <surefire.version>3.5.4</surefire.version>
     <failsafe.version>3.5.4</failsafe.version>
     <sonar.server.version>9.9.7.96285</sonar.server.version>
-    <sonar-plugin-api.version>13.4.3.4290</sonar-plugin-api.version>
+    <sonar-plugin-api.version>11.3.0.2824</sonar-plugin-api.version>
     <sonar-java.version>8.24.0.42567</sonar-java.version>
     
     <sonar-orchestrator.version>6.1.0.3962</sonar-orchestrator.version>
@@ -249,7 +249,7 @@
     <dependency>
       <groupId>org.sonarsource.api.plugin</groupId>
       <artifactId>sonar-plugin-api-test-fixtures</artifactId>
-      <version>${sonar-plugin-api.version}</version>
+      <version>13.4.3.4290</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
