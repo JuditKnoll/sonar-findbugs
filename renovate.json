@@ -63,6 +63,42 @@
       ],
       "depNameTemplate": "com.h3xstream.findsecbugs:findsecbugs-plugin",
       "datasourceTemplate": "maven"
+    },
+    {
+      "customType": "regex",
+      "description": "Update the SpotBugs version in the README compatibility table",
+      "managerFilePatterns": [
+        "/^README\\.md$/"
+      ],
+      "matchStrings": [
+        "[\\s\\S]*\\n\\s*[^|\\r\\n]+\\s*\\|\\s*(?<currentValue>[^|\\r\\n]+)\\s+\\(SpotBugs\\)\\s*\\|\\s*[^|\\r\\n]+\\s*\\|\\s*[^|\\r\\n]+\\s*\\|\\s*[^|\\r\\n]+\\s*\\|[\\s\\S]*$"
+      ],
+      "depNameTemplate": "com.github.spotbugs:spotbugs",
+      "datasourceTemplate": "maven"
+    },
+    {
+      "customType": "regex",
+      "description": "Update the FindSecBugs version in the README compatibility table",
+      "managerFilePatterns": [
+        "/^README\\.md$/"
+      ],
+      "matchStrings": [
+        "[\\s\\S]*\\n\\s*[^|\\r\\n]+\\s*\\|\\s*[^|\\r\\n]+\\s*\\|\\s*(?<currentValue>[^|\\r\\n]+)\\s*\\|\\s*[^|\\r\\n]+\\s*\\|\\s*[^|\\r\\n]+\\s*\\|[\\s\\S]*$"
+      ],
+      "depNameTemplate": "com.h3xstream.findsecbugs:findsecbugs-plugin",
+      "datasourceTemplate": "maven"
+    },
+    {
+      "customType": "regex",
+      "description": "Update the FB-Contrib version in the README compatibility table",
+      "managerFilePatterns": [
+        "/^README\\.md$/"
+      ],
+      "matchStrings": [
+        "[\\s\\S]*\\n\\s*[^|\\r\\n]+\\s*\\|\\s*[^|\\r\\n]+\\s*\\|\\s*[^|\\r\\n]+\\s*\\|\\s*(?<currentValue>[^|\\r\\n]+)\\s+\\(sb-contrib\\)\\s*\\|\\s*[^|\\r\\n]+\\s*\\|[\\s\\S]*$"
+      ],
+      "depNameTemplate": "com.mebigfatguy.sb-contrib:sb-contrib",
+      "datasourceTemplate": "maven"
     }
   ]
 }
