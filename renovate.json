@@ -27,67 +27,42 @@
       ],
       "depNameTemplate": "{{{groupId}}}:{{{artifactId}}}",
       "datasourceTemplate": "maven"
+    },
+    {
+      "customType": "regex",
+      "description": "Update spotbugs.version property in pom.xml",
+      "managerFilePatterns": [
+        "/^pom\\.xml$/"
+      ],
+      "matchStrings": [
+        "<spotbugs.version>(?<currentValue>[^<]+)</spotbugs.version>"
+      ],
+      "depNameTemplate": "com.github.spotbugs:spotbugs",
+      "datasourceTemplate": "maven"
+    },
+    {
+      "customType": "regex",
+      "description": "Update sbcontrib.version property in pom.xml",
+      "managerFilePatterns": [
+        "/^pom\\.xml$/"
+      ],
+      "matchStrings": [
+        "<sbcontrib.version>(?<currentValue>[^<]+)</sbcontrib.version>"
+      ],
+      "depNameTemplate": "com.mebigfatguy.sb-contrib:sb-contrib",
+      "datasourceTemplate": "maven"
+    },
+    {
+      "customType": "regex",
+      "description": "Update findsecbugs.version property in pom.xml",
+      "managerFilePatterns": [
+        "/^pom\\.xml$/"
+      ],
+      "matchStrings": [
+        "<findsecbugs.version>(?<currentValue>[^<]+)</findsecbugs.version>"
+      ],
+      "depNameTemplate": "com.h3xstream.findsecbugs:findsecbugs-plugin",
+      "datasourceTemplate": "maven"
     }
-  ],
-  "packageRules": [
-    {
-      "description": "Regenerate SpotBugs profile XMLs, update README metadata and FindbugsRulesDefinition.RULE_COUNT after SpotBugs update",
-      "matchPackageNames": [
-        "com.github.spotbugs:spotbugs"
-      ],
-      "postUpgradeTasks": {
-        "commands": [
-          "TOTAL_BUGS=$(cd generate_profiles && groovy BuildXmlFiles.groovy | awk '/Total bugs patterns/{print $4}' | tail -1); export TOTAL_BUGS; node -e 'const fs=require(\"fs\");const bugs=process.env.TOTAL_BUGS;if(!bugs)throw new Error(\"Total bugs patterns not found\");const pom=fs.readFileSync(\"pom.xml\",\"utf8\");const spot=(pom.match(/<spotbugs.version>([^<]+)<\\/spotbugs.version>/)||[])[1];if(!spot)throw new Error(\"spotbugs.version not found in pom.xml\");const p=\"README.md\";const lines=fs.readFileSync(p,\"utf8\").split(\"\\n\");for(let i=0;i<lines.length;i++){if(lines[i].includes(\"SpotBugs_rules-\")){lines[i]=lines[i].replace(/(SpotBugs_rules-)\\d+(-brightgreen\\.svg\\?maxAge=2592000)/,`$1${bugs}$2`);break;}}let last=-1;for(let i=0;i<lines.length;i++){if(/^\\s*[0-9]+\\.[0-9]+\\.[0-9]+(?:-[^|\\s]+)?\\s*\\|/.test(lines[i]))last=i;}if(last>=0){const cols=lines[last].split(\"|\");if(cols.length>=2){cols[1]=` ${spot} (SpotBugs) `;lines[last]=cols.join(\"|\");}}fs.writeFileSync(p,lines.join(\"\\n\"));'",
-          "node -e 'const fs=require(\"fs\");const path=require(\"path\");const dir=\"src/main/resources/org/sonar/plugins/findbugs\";for(const name of fs.readdirSync(dir)){if(!name.endsWith(\".xml\"))continue;const p=path.join(dir,name);const content=fs.readFileSync(p,\"utf8\");fs.writeFileSync(p,content.replace(/\\r?\\n/g,\"\\r\\n\"),\"utf8\");}' ",
-          "node -e 'const fs=require(\"fs\");const xml=fs.readFileSync(\"src/main/resources/org/sonar/plugins/findbugs/rules-findbugs.xml\",\"utf8\");const ruleCount=(xml.match(/<\\/rule>/g)||[]).length;const jf=\"src/main/java/org/sonar/plugins/findbugs/rules/FindbugsRulesDefinition.java\";let java=fs.readFileSync(jf,\"utf8\");const dm=java.match(/DEACTIVED_RULE_COUNT\\s*=\\s*(\\d+)/);const deactivated=dm?parseInt(dm[1]):0;const newCount=ruleCount-deactivated;java=java.replace(/((?<!DEACTIVED_)RULE_COUNT\\s*=\\s*)\\d+/,`$1${newCount}`);fs.writeFileSync(jf,java,\"utf8\");'"
-        ],
-        "fileFilters": [
-          "README.md",
-          "src/main/resources/org/sonar/plugins/findbugs/*.xml",
-          "src/main/java/org/sonar/plugins/findbugs/rules/FindbugsRulesDefinition.java"
-        ],
-        "executionMode": "update"
-      }
-    },
-    {
-      "description": "Regenerate SpotBugs profile XMLs, update README metadata and FbContribRulesDefinition.RULE_COUNT after sb-contrib update",
-      "matchPackageNames": [
-        "com.mebigfatguy.sb-contrib:sb-contrib"
-      ],
-      "postUpgradeTasks": {
-        "commands": [
-          "TOTAL_BUGS=$(cd generate_profiles && groovy BuildXmlFiles.groovy | awk '/Total bugs patterns/{print $4}' | tail -1); export TOTAL_BUGS; node -e 'const fs=require(\"fs\");const bugs=process.env.TOTAL_BUGS;if(!bugs)throw new Error(\"Total bugs patterns not found\");const pom=fs.readFileSync(\"pom.xml\",\"utf8\");const sbcontrib=(pom.match(/<sbcontrib.version>([^<]+)<\\/sbcontrib.version>/)||[])[1];if(!sbcontrib)throw new Error(\"sbcontrib.version not found in pom.xml\");const p=\"README.md\";const lines=fs.readFileSync(p,\"utf8\").split(\"\\n\");let last=-1;for(let i=0;i<lines.length;i++){if(/^\\s*[0-9]+\\.[0-9]+\\.[0-9]+(?:-[^|\\s]+)?\\s*\\|/.test(lines[i]))last=i;}if(last>=0){const cols=lines[last].split(\"|\");if(cols.length>=5){cols[3]=` ${sbcontrib} (sb-contrib) `;lines[last]=cols.join(\"|\");}}fs.writeFileSync(p,lines.join(\"\\n\"));'",
-          "node -e 'const fs=require(\"fs\");const path=require(\"path\");const dir=\"src/main/resources/org/sonar/plugins/findbugs\";for(const name of fs.readdirSync(dir)){if(!name.endsWith(\".xml\"))continue;const p=path.join(dir,name);const content=fs.readFileSync(p,\"utf8\");fs.writeFileSync(p,content.replace(/\\r?\\n/g,\"\\r\\n\"),\"utf8\");}' ",
-          "node -e 'const fs=require(\"fs\");const xml=fs.readFileSync(\"src/main/resources/org/sonar/plugins/findbugs/rules-fbcontrib.xml\",\"utf8\");const ruleCount=(xml.match(/<\\/rule>/g)||[]).length;const jf=\"src/main/java/org/sonar/plugins/findbugs/rules/FbContribRulesDefinition.java\";let java=fs.readFileSync(jf,\"utf8\");const dm=java.match(/DEACTIVED_RULE_COUNT\\s*=\\s*(\\d+)/);const deactivated=dm?parseInt(dm[1]):0;const newCount=ruleCount-deactivated;java=java.replace(/((?<!DEACTIVED_)RULE_COUNT\\s*=\\s*)\\d+/,`$1${newCount}`);fs.writeFileSync(jf,java,\"utf8\");'"
-        ],
-        "fileFilters": [
-          "README.md",
-          "src/main/resources/org/sonar/plugins/findbugs/*.xml",
-          "src/main/java/org/sonar/plugins/findbugs/rules/FbContribRulesDefinition.java"
-        ],
-        "executionMode": "update"
-      }
-    },
-     {
-       "description": "Regenerate SpotBugs profile XMLs, update README metadata and FindSecurityBugs RULE_COUNTs after findsecbugs update",
-       "matchPackageNames": [
-         "com.h3xstream.findsecbugs:findsecbugs-plugin"
-       ],
-       "postUpgradeTasks": {
-         "commands": [
-           "TOTAL_BUGS=$(cd generate_profiles && groovy BuildXmlFiles.groovy | awk '/Total bugs patterns/{print $4}' | tail -1); export TOTAL_BUGS; node -e 'const fs=require(\"fs\");const bugs=process.env.TOTAL_BUGS;if(!bugs)throw new Error(\"Total bugs patterns not found\");const pom=fs.readFileSync(\"pom.xml\",\"utf8\");const fsb=(pom.match(/<findsecbugs.version>([^<]+)<\\/findsecbugs.version>/)||[])[1];if(!fsb)throw new Error(\"findsecbugs.version not found in pom.xml\");const p=\"README.md\";const lines=fs.readFileSync(p,\"utf8\").split(\"\\n\");let last=-1;for(let i=0;i<lines.length;i++){if(/^\\s*[0-9]+\\.[0-9]+\\.[0-9]+(?:-[^|\\s]+)?\\s*\\|/.test(lines[i]))last=i;}if(last>=0){const cols=lines[last].split(\"|\");if(cols.length>=4){cols[2]=` ${fsb} `;lines[last]=cols.join(\"|\");}}fs.writeFileSync(p,lines.join(\"\\n\"));'",
-           "node -e 'const fs=require(\"fs\");const path=require(\"path\");const dir=\"src/main/resources/org/sonar/plugins/findbugs\";for(const name of fs.readdirSync(dir)){if(!name.endsWith(\".xml\"))continue;const p=path.join(dir,name);const content=fs.readFileSync(p,\"utf8\");fs.writeFileSync(p,content.replace(/\\r?\\n/g,\"\\r\\n\"),\"utf8\");}' ",
-           "node -e 'const fs=require(\"fs\");const xml=fs.readFileSync(\"src/main/resources/org/sonar/plugins/findbugs/rules-findsecbugs.xml\",\"utf8\");const ruleCount=(xml.match(/<\\/rule>/g)||[]).length;const jf=\"src/main/java/org/sonar/plugins/findbugs/rules/FindSecurityBugsRulesDefinition.java\";let java=fs.readFileSync(jf,\"utf8\");const newCount=ruleCount;java=java.replace(/((?<!DEACTIVED_)RULE_COUNT\\s*=\\s*)\\d+/,`$1${newCount}`);fs.writeFileSync(jf,java,\"utf8\");'",
-           "node -e 'const fs=require(\"fs\");const xml=fs.readFileSync(\"src/main/resources/org/sonar/plugins/findbugs/rules-scala.xml\",\"utf8\");const ruleCount=(xml.match(/<\\/rule>/g)||[]).length;const jf=\"src/main/java/org/sonar/plugins/findbugs/rules/FindSecurityBugsScalaRulesDefinition.java\";let java=fs.readFileSync(jf,\"utf8\");const newCount=ruleCount;java=java.replace(/((?<!DEACTIVED_)RULE_COUNT\\s*=\\s*)\\d+/,`$1${newCount}`);fs.writeFileSync(jf,java,\"utf8\");'"
-         ],
-         "fileFilters": [
-           "README.md",
-           "src/main/resources/org/sonar/plugins/findbugs/*.xml",
-           "src/main/java/org/sonar/plugins/findbugs/rules/FindSecurityBugsRulesDefinition.java",
-           "src/main/java/org/sonar/plugins/findbugs/rules/FindSecurityBugsScalaRulesDefinition.java"
-         ],
-         "executionMode": "update"
-       }
-     }
   ]
 }
