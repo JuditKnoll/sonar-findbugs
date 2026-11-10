@@ -29,6 +29,12 @@ jobs:
           # 26.x
           - SONAR_SERVER_VERSION: 26.8.0.126808
             SONAR_SERVER_JAVA_VERSION: 21
+          - SONAR_SERVER_VERSION: 26.9.0.129388
+            SONAR_SERVER_JAVA_VERSION: 21
+          - SONAR_SERVER_VERSION: 26.10.0.133078
+            SONAR_SERVER_JAVA_VERSION: 21
+          - SONAR_SERVER_VERSION: 26.11.0.134175
+            SONAR_SERVER_JAVA_VERSION: 21
           # https://mvnrepository.com/artifact/org.sonarsource.sonarqube/sonar-core
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
